@@ -69,6 +69,7 @@ function LifeUniverse()
     this.root = null;
 
     this.rewind_state = null;
+    this.rewind_generation = 0;
 
     /**
      * number of generations to calculate at one time,
@@ -109,11 +110,12 @@ LifeUniverse.prototype.pow2 = function(x)
 LifeUniverse.prototype.save_rewind_state = function()
 {
     this.rewind_state = this.root;
+    this.rewind_generation = this.generation;
 };
 
 LifeUniverse.prototype.restore_rewind_state = function()
 {
-    this.generation = 0;
+    this.generation = this.rewind_generation;
     this.root = this.rewind_state;
 
     // make sure to rebuild the hashmap, in case its size changed
@@ -437,6 +439,9 @@ LifeUniverse.prototype.clear_pattern = function()
 
     this.root = this.empty_tree(3);
     this.generation = 0;
+
+    this.rewind_state = null;
+    this.rewind_generation = 0;
 };
 
 LifeUniverse.prototype.get_bounds = function(field_x, field_y)

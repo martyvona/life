@@ -1353,12 +1353,7 @@ var
     {
         var time = Date.now();
 
-        if(life.generation === 0)
-        {
-            life.save_rewind_state();
-        }
-
-        life.next_generation(is_single);
+        life.next_step(is_single);
         drawer.redraw(life.root);
 
         update_hud(1000 / (Date.now() - time));
