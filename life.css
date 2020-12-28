@@ -59,18 +59,24 @@ html {
     -moz-user-select: none;
 }
 #label_step:before {
-    content: "Step: ";
+    content: "Gen/Step: ";
 }
 #label_fps:before {
     content: "FPS: ";
 }
+#label_sps:before {
+    content: "Steps/Sec: ";
+}
 #label_gen:before {
     content: "Gen: ";
+}
+#label_cur_step:before {
+    content: "Step: ";
 }
 #label_pop:before {
     content: "Pop: ";
 }
-#label_gen, #label_pop, #label_mou, #label_zoom, #label_step, #label_fps {
+#label_cur_step, #label_gen, #label_pop, #label_mou, #label_zoom, #label_step, #label_fps, #label_sps {
     padding: 0px 1vw;
 }
 .button, .menu {

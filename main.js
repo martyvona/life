@@ -73,6 +73,10 @@ var
 
         loaded = false,
 
+        auto_start = false,
+        goto_step = 0,
+        reset_after_step = 0,
+        steps_per_sec = 0,
 
         life = new LifeUniverse(),
         drawer = new LifeCanvasDrawer(),
@@ -138,6 +142,47 @@ var
             param = query[i].split("=");
 
             parameters[param[0]] = param[1];
+        }
+
+        if (parameters["run"] === "1")
+        {
+            auto_start = true;
+        }
+
+        if (parameters["steps_per_sec"] && /^\d+$/.test(parameters["steps_per_sec"]))
+        {
+            steps_per_sec = +parameters["steps_per_sec"];
+        }
+
+        if (parameters["reset_after_step"] && /^\d+$/.test(parameters["reset_after_step"]))
+        {
+            reset_after_step = +parameters["reset_after_step"];
+        }
+
+        if (parameters["goto_step"] && /^(-?\d+[+])?\d+([*](pm_)?now_sec)?$/.test(parameters["goto_step"]))
+        {
+            var goto = parameters["goto_step"];
+            var now_sec = 1;
+            var offset = 0; //200
+            var plus = goto.indexOf("+");
+            if (plus > 0)
+            {
+                offset = Number(goto.substring(0, plus));
+                goto = goto.substring(plus + 1, goto.length);
+            }
+            if (goto.endsWith("now_sec"))
+            {
+                var sfx = "now_sec";
+                var now = new Date();
+                now_sec = (now.getHours() * 60 + now.getMinutes()) * 60 + now.getSeconds();
+                if (goto.endsWith("pm_now_sec"))
+                {
+                    sfx = "pm_now_sec";
+                    now_sec -= 12 * 60 * 60;
+                }
+                goto = goto.substring(0, goto.length - (sfx.length + 1));
+            }
+            goto_step = offset + Number(goto) * now_sec;
         }
 
         if(parameters["step"] && /^\d+$/.test(parameters["step"]))
@@ -1256,6 +1301,11 @@ var
                 view_url : view_url,
                 source_url: pattern_source_url,
             };
+
+            if (auto_start)
+            {
+                run();
+            }
         });
     }
 
@@ -1287,36 +1337,33 @@ var
 
     function run()
     {
-        var n = 0,
-            start,
-            last_frame,
-            frame_time = 1000 / max_fps,
-            interval,
-            per_frame = frame_time;
-
         set_text($("run_button"), "Stop");
 
         running = true;
 
         if(life.generation === 0)
         {
+            for (var i = 0; i < goto_step; i++)
+            {
+                life.next_step(true);
+            }
             life.save_rewind_state();
         }
 
-        interval = setInterval(function()
-        {
-            update_hud(1000 / frame_time);
-        }, 666);
+        var ms_per_frame = 1000 / max_fps,
+            now_ms = Date.now(),
+            start_ms = now_ms,
+            total_steps = 0,
+            last_frame_ms = now_ms - ms_per_frame,
+            last_frame_period_ms = ms_per_frame,
+            ms_per_step = steps_per_sec > 0 ? (1000 / steps_per_sec) : ms_per_frame,
+            last_step_period_ms = ms_per_step;
 
-        start = Date.now();
-        last_frame = start - per_frame;
-
-        function update()
+        function draw()
         {
             if(!running)
             {
-                clearInterval(interval);
-                update_hud(1000 / frame_time);
+                update_hud(1000 / last_frame_period_ms);
 
                 if(onstop) {
                     onstop();
@@ -1324,23 +1371,46 @@ var
                 return;
             }
 
-            var time = Date.now();
+            ms_per_frame = 1000 / max_fps;
 
-            if(per_frame * n < (time - start))
+            if(Date.now() - last_frame_ms >= ms_per_frame)
             {
-                life.next_generation(true);
                 drawer.redraw(life.root);
+                now_ms = Date.now();
+                last_frame_period_ms = now_ms - last_frame_ms;
+                last_frame_ms = now_ms;
+                last_step_period_ms = (now_ms - start_ms) / total_steps;
+                update_hud(1000 / last_frame_period_ms, 1000 / last_step_period_ms);
+            }
 
-                n++;
+            nextFrame(draw);
+        }
 
-                // readability ... my ass
-                frame_time += (-last_frame - frame_time + (last_frame = time)) / 15;
+        draw();
 
-                if(frame_time < .7 * per_frame)
+        function update()
+        {
+            if(!running)
+            {
+                return;
+            }
+
+            now_ms = Date.now();
+
+            ms_per_frame = 1000 / max_fps;
+            ms_per_step = steps_per_sec > 0 ? (1000 / steps_per_sec) : ms_per_frame;
+
+            while (total_steps < (now_ms - start_ms) / ms_per_step)
+            {
+                life.next_step(true);
+                if (reset_after_step > 0 && life.generation >= (life.pow2(life.step) * (reset_after_step + goto_step)))
                 {
-                    n = 1;
-                    start = Date.now();
+                    life.restore_rewind_state();
+                    start_ms = Date.now();
+                    total_steps = 0;
+                    break;
                 }
+                total_steps++;
             }
 
             nextFrame(update);
@@ -1441,14 +1511,27 @@ var
     /**
      * @param {number=} fps
      */
-    function update_hud(fps)
+    function update_hud(fps, sps)
     {
-        if(fps) {
+        sps = sps || fps;
+
+        if(fps)
+        {
             set_text($("label_fps"), fps.toFixed(1));
         }
 
+        if(sps)
+        {
+            set_text($("label_sps"), sps.toFixed(1));
+        }
+
+        set_text($("label_step"), life.pow2(life.step));
+
         set_text($("label_gen"), format_thousands(life.generation, "\u202f"));
         fix_width($("label_gen"));
+
+        set_text($("label_cur_step"), format_thousands(life.generation / life.pow2(life.step), "\u202f"));
+        fix_width($("label_cur_step"));
 
         set_text($("label_pop"), format_thousands(life.root.population, "\u202f"));
         fix_width($("label_pop"));

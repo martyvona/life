@@ -346,7 +346,7 @@ LifeUniverse.prototype.create_tree = function(nw, ne, sw, se)
     }
 };
 
-LifeUniverse.prototype.next_generation = function(is_single)
+LifeUniverse.prototype.next_step = function(is_single)
 {
     var root = this.root;
 
