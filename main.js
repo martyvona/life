@@ -257,7 +257,13 @@ var
                 "statusbar", "about_button", "examples_menu",
                 "import_button", "settings_button", "zoomout_button",
                 "zoomin_button", "clear_button", "superstep_button",
-                "step_button", "rewind_button"
+                "step_button", "rewind_button", "randomize_button",
+                "export_button", "run_button", "normalspeed_button",
+                "slower_button", "faster_button", "initial_pos_button",
+                "nw_button", "n_button", "ne_button",
+                "w_button", "middle_button", "e_button",
+                "sw_button", "s_button", "se_button"
+                
             ];
 
             for(var i = 0; i < elements.length; i++)
