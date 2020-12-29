@@ -1356,10 +1356,14 @@ var
 
         if(life.generation === 0)
         {
-            for(var i = 0; i < goto_step; i++)
+            var orig_step = life.step;
+            var goto_gen = life.pow2(orig_step) * goto_step;
+            while (life.generation < goto_gen)
             {
+                life.set_step(Math.floor(Math.log(goto_gen - life.generation) / Math.LN2));
                 life.next_step(true);
             }
+            life.set_step(orig_step);
             life.save_rewind_state();
         }
 
