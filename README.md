@@ -9,6 +9,7 @@ To reset the clock to the current local time simply reload the page.
 ## Modifications
 
 * add `auto_start=1` URL parameter
+* add `steps_per_sec=STEPS` to sync the step speed to wall clock time
 * add `goto_step=OFFSET+STEP*MULT` to fast-forward a specfic number of steps before running
     * `OFFSET+` is optional; if present, `OFFSET` is an integer (positive or negative) number of steps
     * `STEP` is required; a non-negative number of steps
