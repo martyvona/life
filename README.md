@@ -1,6 +1,6 @@
 Fork of in-browser pure Javascript Conway's game of [life](https://github.com/copy/life) by Fabian Hemmer, with modifications to support running the [digital clock](https://codegolf.stackexchange.com/a/111932) by [dim](https://codegolf.stackexchange.com/users/64412/dim) to actually tell time.
 
-https://martyvona.github.io/life/index.html?pattern=digitalclock&step=64&steps_per_sec=3&reset_after_step=259200&goto_step=200+3*pm_now_sec&run=1&fps=6&noui=1
+https://martyvona.github.io/life/min/index.html?pattern=digitalclock&step=64&steps_per_sec=3&reset_after_step=259200&goto_step=200+3*pm_now_sec&run=1&fps=6&noui=1
 
 Omit the "noui=1" option to show the UI if you want to play with it, e.g. change the speed, load other patterns, etc.
 
