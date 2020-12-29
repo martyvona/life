@@ -144,26 +144,26 @@ var
             parameters[param[0]] = param[1];
         }
 
-        if (parameters["run"] === "1")
+        if(parameters["run"] === "1")
         {
             auto_start = true;
         }
 
-        if (parameters["steps_per_sec"] && /^\d+$/.test(parameters["steps_per_sec"]))
+        if(parameters["steps_per_sec"] && /^\d+$/.test(parameters["steps_per_sec"]))
         {
             steps_per_sec = +parameters["steps_per_sec"];
         }
 
-        if (parameters["reset_after_step"] && /^\d+$/.test(parameters["reset_after_step"]))
+        if(parameters["reset_after_step"] && /^\d+$/.test(parameters["reset_after_step"]))
         {
             reset_after_step = +parameters["reset_after_step"];
         }
 
-        if (parameters["goto_step"] && /^(-?\d+[+])?\d+([*](pm_)?now_sec)?$/.test(parameters["goto_step"]))
+        if(parameters["goto_step"] && /^(-?\d+[+])?\d+([*](pm_)?now_sec)?$/.test(parameters["goto_step"]))
         {
             var goto = parameters["goto_step"];
             var now_sec = 1;
-            var offset = 0; //200
+            var offset = 0;
             var plus = goto.indexOf("+");
             if (plus > 0)
             {
@@ -1349,7 +1349,7 @@ var
 
         if(life.generation === 0)
         {
-            for (var i = 0; i < goto_step; i++)
+            for(var i = 0; i < goto_step; i++)
             {
                 life.next_step(true);
             }
@@ -1362,8 +1362,7 @@ var
             total_steps = 0,
             last_frame_ms = now_ms - ms_per_frame,
             last_frame_period_ms = ms_per_frame,
-            ms_per_step = steps_per_sec > 0 ? (1000 / steps_per_sec) : ms_per_frame,
-            last_step_period_ms = ms_per_step;
+            ms_per_step = steps_per_sec > 0 ? (1000 / steps_per_sec) : ms_per_frame;
 
         function draw()
         {
@@ -1385,8 +1384,8 @@ var
                 now_ms = Date.now();
                 last_frame_period_ms = now_ms - last_frame_ms;
                 last_frame_ms = now_ms;
-                last_step_period_ms = (now_ms - start_ms) / total_steps;
-                update_hud(1000 / last_frame_period_ms, 1000 / last_step_period_ms);
+                var avg_step_period_ms = total_steps > 0 ? ((now_ms - start_ms) / total_steps) : 0;
+                update_hud(1000 / last_frame_period_ms, avg_step_period_ms > 0 ? (1000 / avg_step_period_ms) : 0);
             }
 
             nextFrame(draw);
@@ -1406,10 +1405,10 @@ var
             ms_per_frame = 1000 / max_fps;
             ms_per_step = steps_per_sec > 0 ? (1000 / steps_per_sec) : ms_per_frame;
 
-            while (total_steps < (now_ms - start_ms) / ms_per_step)
+            while((total_steps < (now_ms - start_ms) / ms_per_step) && (Date.now() - now_ms <= ms_per_step))
             {
                 life.next_step(true);
-                if (reset_after_step > 0 && life.generation >= (life.pow2(life.step) * (reset_after_step + goto_step)))
+                if(reset_after_step > 0 && life.generation >= (life.pow2(life.step) * (reset_after_step + goto_step)))
                 {
                     life.restore_rewind_state();
                     start_ms = Date.now();
