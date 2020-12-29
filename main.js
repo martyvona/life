@@ -159,7 +159,7 @@ var
             reset_after_step = +parameters["reset_after_step"];
         }
 
-        if(parameters["goto_step"] && /^(-?\d+[+])?\d+([*](pm_)?now_sec)?$/.test(parameters["goto_step"]))
+        if(parameters["goto_step"] && /^([+-]?\d+[+])?\d+([*](pm_)?now_sec)?$/.test(parameters["goto_step"]))
         {
             var goto = parameters["goto_step"];
             var now_sec = 1;
@@ -178,7 +178,14 @@ var
                 if (goto.endsWith("pm_now_sec"))
                 {
                     sfx = "pm_now_sec";
-                    now_sec -= 12 * 60 * 60;
+                    if(now_sec >= 12 * 60 * 60)
+                    {
+                        now_sec -= 12 * 60 * 60;
+                    }
+                    else
+                    {
+                        now_sec += 12 * 60 * 60;
+                    }
                 }
                 goto = goto.substring(0, goto.length - (sfx.length + 1));
             }
