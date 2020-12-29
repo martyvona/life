@@ -10,11 +10,11 @@ To reset the clock to the current local time simply reload the page.
 
 * add `auto_start=1` URL parameter
 * add `steps_per_sec=STEPS` to sync the step speed to wall clock time
-* add `goto_step=OFFSET+STEP*MULT` to fast-forward a specfic number of steps before running
+* add `goto_step=OFFSET+STEPS*MULT` to fast-forward a specfic number of steps before running
     * `OFFSET+` is optional; if present, `OFFSET` is an integer (positive or negative) number of steps
-    * `STEP` is required; a non-negative number of steps
+    * `STEPS` is required; a non-negative number of steps
     * `*MULT` is optional; if present it can be either `*now_sec`, which will be replaced with the number of seconds sicne the most recent midnight (12:00 AM) in local wall-clock time at page load, or `*pm_now_sec`, which will be replaced with the number of seconds since the most recent noon (12:00 PM)
-* add `reset_after_step=STEP` to auto rewind to the initial state (after the `goto_step` fast forward, if any) after a given number of steps
+* add `reset_after_step=STEPS` to auto rewind to the initial state (after the `goto_step` fast forward, if any) after a given number of steps
 * add digital clock pattern
 * bugfix noui option
 * restore generation number on rewind
