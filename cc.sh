@@ -1,13 +1,13 @@
 # Closure Compiler
 #
 # To compile, get the script from http://closure-compiler.googlecode.com/files/compiler-latest.zip
-# And put it into ~/.local or change the path below
+# And set CLOSURE_COMPILER_JAR to point to its jarfile
 
 FILENAME="life-min.js"
 
 ls -l $FILENAME
 
-java -jar ~/www/v86/closure-compiler/compiler.jar \
+java -jar $CLOSURE_COMPILER_JAR \
     --compilation_level ADVANCED_OPTIMIZATIONS\
     --language_in ECMASCRIPT6_STRICT\
     --js_output_file $FILENAME\
